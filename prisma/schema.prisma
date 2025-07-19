@@ -1,0 +1,308 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  UPI
+  CARD
+  NETBANKING
+  WALLET
+  EMI
+}
+enum BillStatus {
+  PENDING
+  PAID
+  PARTIALLY_PAID
+  CANCELLED
+  OVERDUE
+}
+
+enum OrderType {
+  HOTEL
+  EXPERIENCE
+  OTHER // For future extensibility (e.g., add-on services)
+}
+
+model users {
+  id         String    @unique @default(uuid())
+  userId     Int       @id @default(autoincrement())
+  firstName  String
+  lastName   String
+  password   String
+  salt       String    @unique
+  email      String    @unique
+  role       UserRole
+  otp        String?
+  isVerified Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime? @updatedAt
+
+  profile Profile?
+
+  bills bills[]
+
+  reservations reservations[]
+
+  hotel_ratings hotel_ratings[]
+
+  ExperienceRating experience_rating[]
+
+  orders orders[]
+}
+
+model Profile {
+  id         String    @unique @default(uuid())
+  profile_id Int       @id @default(autoincrement())
+  user_id    Int       @unique
+  avatar     String?
+  address    String?
+  city       String?
+  state      String?
+  zip_code   String?
+  country    String?
+  user       users     @relation(fields: [user_id], references: [userId])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+}
+
+model hotels {
+  id                String              @unique @default(uuid())
+  hotel_id          Int                 @id @default(autoincrement())
+  name              String              @db.VarChar(100)
+  address           String              @db.VarChar(255)
+  city              String              @db.VarChar(50)
+  country           String              @db.VarChar(50)
+  phone             String?             @db.VarChar(20)
+  email             String?             @unique @db.VarChar(100)
+  description       String?
+  star_rating       Int? // 1-5, enforce via application logic
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  deletedAt         DateTime?
+  hotel_ratings     hotel_ratings[] // One-to-many
+  room_types        room_types[] // One-to-many
+  reservations      reservations[] // One-to-many
+  room_hourly_rates room_hourly_rates[] // One-to-many
+
+  hotel_images hotel_images[]
+}
+
+model hotel_images {
+  image_id    Int      @id @default(autoincrement())
+  hotel_id    Int
+  hotel       hotels   @relation(fields: [hotel_id], references: [hotel_id], onDelete: Cascade)
+  image_url   String   @db.VarChar(255) // URL or file path to the image
+  description String?  @db.VarChar(255) // Optional description (e.g., "Lobby view")
+  is_primary  Boolean  @default(false) // Flag for primary image
+  createdAt   DateTime @default(now())
+}
+
+model hotel_ratings {
+  rating_id String       @id @default(uuid())
+  hotel_id  Int
+  user_id   Int
+  hotel     hotels    @relation(fields: [hotel_id], references: [hotel_id], onDelete: Cascade)
+  user     users     @relation(fields: [user_id], references: [userId], onDelete: Restrict)
+  rating    Int // 1-5, enforce via application logic
+  comment   String?   @db.Text
+  status    ReviewStatus @default(APPROVED) // two more status pennding & Reject
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model experience {
+  id            String    @unique @default(uuid())
+  experience_id Int       @id @default(autoincrement())
+  title         String    @db.VarChar(100)
+  address       String    @db.VarChar(255)
+  city          String    @db.VarChar(50)
+  country       String    @db.VarChar(50)
+  phone         String?   @db.VarChar(20)
+  email         String?   @unique @db.VarChar(100)
+  price         String
+  description   String?
+  star_rating   Int? // 1–5; enforce in application logic
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  images  experience_images[] // One-to-many
+  ratings experience_rating[] // One-to-many
+}
+
+model experience_images {
+  image_id      Int        @id @default(autoincrement())
+  experience_id Int
+  experience    experience @relation(fields: [experience_id], references: [experience_id], onDelete: Cascade)
+  image_url     String     @db.VarChar(255)
+  description   String?    @db.VarChar(255)
+  is_primary    Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+}
+
+model experience_rating {
+  rating_id     Int        @id @default(autoincrement())
+  experience_id Int
+  user_id       Int
+  experience    experience @relation(fields: [experience_id], references: [experience_id], onDelete: Cascade)
+  user          users      @relation(fields: [user_id], references: [userId], onDelete: Restrict)
+  rating        Int // 1–5; enforce in application logic
+  comment       String?    @db.Text
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  deletedAt     DateTime?
+}
+
+// Room Types table
+model room_types {
+  id                String              @unique @default(uuid())
+  room_type_id      Int                 @id @default(autoincrement())
+  hotel_id          Int
+  hotel             hotels              @relation(fields: [hotel_id], references: [hotel_id], onDelete: Cascade)
+  type_name         String              @db.VarChar(50)
+  description       String?             @db.Text
+  base_price        Decimal             @db.Decimal(10, 2) // Base price for full-day
+  max_occupancy     Int
+  // room_hourly_rates room_hourly_rates[] // One-to-many
+}
+
+// Rooms table
+// model rooms {
+//   room_id      Int          @id @default(autoincrement())
+//   hotel_id     Int
+//   room_type_id Int
+//   hotel        hotels       @relation(fields: [hotel_id], references: [hotel_id], onDelete: Cascade)
+//   room_type    room_types   @relation(fields: [room_type_id], references: [room_type_id], onDelete: Restrict)
+//   room_number  String       @db.VarChar(10)
+//   floor        Int?
+//   status       String       @default("available") // Enum: available, occupied, maintenance
+//   last_cleaned DateTime?    @db.Timestamp
+//   reservations reservations[] // One-to-many
+// }
+
+
+// Room Hourly Rates table
+model room_hourly_rates {
+  id             String     @unique @default(uuid())
+  hourly_rate_id Int        @id @default(autoincrement())
+  hotel_id       Int
+  hotel          hotels     @relation(fields: [hotel_id], references: [hotel_id], onDelete: Cascade)
+  duration_hours Int // 2, 6, 8, 24 (validate in app)
+  rate_per_hour  Decimal    @db.Decimal(10, 2)
+
+  @@unique([ hotel_id, duration_hours])
+}
+
+
+model reservations {
+  reservation_id     Int       @id @default(autoincrement())
+  hotel_id           Int
+  user_id            Int
+  hotel              hotels    @relation(fields: [hotel_id], references: [hotel_id], onDelete: Cascade)
+  user              users     @relation(fields: [user_id], references: [userId], onDelete: Restrict)
+  check_in_datetime  DateTime?
+  check_out_datetime DateTime?
+  total_amount       Decimal   @db.Decimal(10, 2)
+  booking_type       String    @default("hourly") // Enum: hourly, fullday
+  duration_hours     Int // 2, 6, 8, 24 (validate in app)
+  status             String    @default("pending") // Enum: confirmed, pending, cancelled, checked_in, checked_out
+  created_at         DateTime  @default(now()) @db.Timestamp
+  deletedAt          DateTime?
+  bills              bills[]   // One-to-many
+  orders             orders[]  // One-to-many
+
+  @@index([hotel_id])
+  @@index([user_id])
+  @@index([status])
+}
+
+model orders {
+  id                String        @unique @default(uuid())
+  order_id          Int           @id @default(autoincrement())
+  reservation_id    Int?          // Nullable for non-hotel orders (e.g., experiences)
+  order_type        OrderType     // Type of order: HOTEL, EXPERIENCE, OTHER
+  user_id           Int
+  reservation       reservations? @relation(fields: [reservation_id], references: [reservation_id], onDelete: Cascade)
+  user              users         @relation(fields: [user_id], references: [userId], onDelete: Restrict)
+  razorpay_order_id String        @unique @db.VarChar(100) // Razorpay order ID
+  razorpay_payment_id String?     @db.VarChar(100) // Razorpay payment ID
+  payment_method    PaymentMethod? // Razorpay payment method
+  amount            Decimal       @db.Decimal(10, 2) // Order amount
+  tax_amount        Decimal?      @db.Decimal(10, 2) // Tax component (e.g., GST)
+  discount_amount   Decimal?      @db.Decimal(10, 2) // Discount applied (if any)
+  currency          String        @default("INR") @db.VarChar(3) // Currency code
+  status            PaymentStatus @default(PENDING) // PENDING, SUCCESS, FAILED, REFUNDED, PARTIALLY_REFUNDED
+  attempts          Int           @default(0) // Number of payment retry attempts
+  webhook_status    String?       @db.VarChar(50) // Webhook delivery status (e.g., DELIVERED, FAILED)
+  subscription_id   String?       @db.VarChar(100) // Razorpay subscription ID for recurring payments
+  notes             Json?         // Store additional metadata (e.g., campaign ID, coupon code)
+  createdAt         DateTime      @default(now()) @db.Timestamp
+  updatedAt         DateTime      @updatedAt
+  deletedAt         DateTime?
+  // refunds           refunds[]     // One-to-many relation with refunds
+
+  @@index([user_id])
+  @@index([reservation_id])
+  @@index([razorpay_order_id])
+  @@index([status])
+}
+
+model bills {
+  id                String       @unique @default(uuid())
+  bill_id           Int          @id @default(autoincrement())
+  reservation_id    Int
+  user_id           Int
+  reservation       reservations @relation(fields: [reservation_id], references: [reservation_id], onDelete: Cascade)
+  user              users        @relation(fields: [user_id], references: [userId], onDelete: Restrict)
+  total_amount      Decimal      @db.Decimal(10, 2) // Total bill amount
+  tax_amount        Decimal?     @db.Decimal(10, 2) // Tax component (e.g., GST)
+  discount_amount   Decimal?     @db.Decimal(10, 2) // Discount applied
+  base_amount       Decimal?     @db.Decimal(10, 2) // Amount before tax/discount
+  invoice_number    String?      @unique @db.VarChar(50) // Unique invoice identifier
+  issue_date        DateTime     @default(now()) @db.Timestamp
+  due_date          DateTime?    // Due date for payment (for credit-based payments)
+  payment_status    BillStatus   @default(PENDING) // PENDING, PAID, PARTIALLY_PAID, CANCELLED, OVERDUE
+  payment_method    String?      @db.VarChar(50) // e.g., "razorpay", "cash", "credit_card"
+  notes             Json?        // Store additional metadata (e.g., billing notes)
+  createdAt         DateTime     @default(now()) @db.Timestamp
+  updatedAt         DateTime     @updatedAt
+  deletedAt         DateTime?
+
+  @@index([reservation_id])
+  @@index([user_id])
+  @@index([payment_status])
+  @@index([invoice_number])
+}

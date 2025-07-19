@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES6", // Specify ECMAScript target version
+    "module": "CommonJS", // Specify module code generation
+    "moduleResolution": "Node", // Module resolution strategy
+    "strict": false, // Enable all strict type-checking options
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "rootDir": "./",
+    "paths": {
+      "src/*": ["./*"]
+    },
+    "esModuleInterop": true, // Enables compatibility with CommonJS-style imports
+    "removeComments": true,
+    "skipLibCheck": true, // Skip type checking of declaration files (to improve build speed)
+    "forceConsistentCasingInFileNames": true, // Ensure consistent casing of filenames
+    "noImplicitAny": true, // Raise error on expressions and declarations with an implied `any` type
+    "strictNullChecks": true, // Enable strict null checks
+    "noImplicitThis": true, // Ensure that `this` is not implicitly `any`
+    "alwaysStrict": true, // Parse all files in strict mode
+    "noUnusedLocals": true, // Report errors on unused local variables
+    "noUnusedParameters": false, // Report errors on unused function parameters
+    "noFallthroughCasesInSwitch": true, // Prevent fallthrough behavior in switch statements
+    "strictFunctionTypes": true, // Enforce function parameter bivariance rules
+    "noImplicitReturns": true, // Report an error if not all code paths in a function return a value
+    "noUncheckedIndexedAccess": true, // Raise errors on accessing possibly undefined object properties via index signatures
+    "useUnknownInCatchVariables": true // Use `unknown` instead of `any` for catch variables
+  },
+  "include": ["src/**/*", "apps/**/*", "libs/**/*", "prisma/**/*"],
+  "exclude": ["node_modules", "dist", "prisma/seeders"]
+}

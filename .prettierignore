@@ -1,0 +1,26 @@
+# Ignore node_modules
+node_modules/
+
+# Ignore build and output directories
+dist/
+build/
+out/
+
+# Ignore specific configuration files
+*.config.js
+*.config.ts
+
+# Ignore test files and directories (if you want)
+**/*.spec.ts
+**/__tests__/
+
+# Ignore environment files
+.env
+*.local
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore coverage reports
+coverage/
