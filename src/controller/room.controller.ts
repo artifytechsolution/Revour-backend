@@ -10,7 +10,20 @@ class RoomController {
 
   async create(req: Request, resp: Response, next: NextFunction) {
     try {
-      const hotel = await this._RoomDIController.create(req.body);
+      console.log('request body of roomsss is commingggg ---------!!!!');
+      console.log(req.body);
+      const customResponse = Array.isArray(req.body)
+        ? req.body.map((item) => ({
+            hotel_id: item.hotel_id,
+            type_name: item.room_name,
+            description: item.description,
+            base_price: item.price,
+            max_occupancy: item.max_occupancy,
+          }))
+        : [];
+
+      const hotel = await this._RoomDIController.create(customResponse);
+
       console.log(hotel instanceof CustomError);
       if (hotel instanceof CustomError) {
         return next(hotel);
@@ -117,6 +130,8 @@ class RoomController {
 
   async createHours(req: Request, resp: Response, next: NextFunction) {
     try {
+      console.log('add hourly data is comming--------!!!!!');
+      console.log(req.body);
       const hotel = await this._RoomDIController.addHours(req.body);
       console.log(hotel instanceof CustomError);
       if (hotel instanceof CustomError) {
@@ -134,7 +149,7 @@ class RoomController {
       );
     }
   }
-    async deleteHours(req: Request, resp: Response, next: NextFunction) {
+  async deleteHours(req: Request, resp: Response, next: NextFunction) {
     try {
       console.log('delete body is comminfgggggg------');
       console.log(req.body);
@@ -158,9 +173,5 @@ class RoomController {
       );
     }
   }
-
-
-
-
 }
 export default RoomController;

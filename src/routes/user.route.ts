@@ -1,6 +1,6 @@
 import express from 'express';
 import userController from '../controller/user.controller';
-import verifyToken from '../middlewares/Verifyauth';
+// import verifyToken from '../middlewares/Verifyauth';
 
 const usercontroller = new userController();
 
@@ -12,9 +12,7 @@ route.post('/register', (req, resp, next) =>
 route.post('/login', (req, resp, next) =>
   usercontroller.Login(req, resp, next),
 );
-route.get('/user', verifyToken, (req, resp, next) => {
-  resp.send('token is working sucessfully');
-});
+route.get('/', (req, resp, next) => usercontroller.allusers(req, resp, next));
 route.patch('/verify', (req, resp, next) =>
   usercontroller.verifyUser(req, resp, next),
 );

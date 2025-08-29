@@ -17,5 +17,22 @@ route.post(
   upload.array('images', 5),
   (req: any, resp: any, next: any) => Hotel.uploadImage(req, resp, next),
 );
+route.get('/find/hours', (req, resp, next) =>
+  Hotel.findByHours(req, resp, next),
+);
+route.post('/hotelunavilable', (req, resp, next) =>
+  Hotel.hotelunavilable(req, resp, next),
+);
+route.get('/hotelunavilableById/:id', (req, resp, next) =>
+  Hotel.hotelunavilableById(req, resp, next),
+);
+route.get('/find/hotelunavilableList', (req, resp, next) =>
+  Hotel.hotelunavilableList(req, resp, next),
+);
+route.post('/addAmenities', (req, resp, next) =>
+  Hotel.addAmenities(req, resp, next),
+);
+route.post('/addpolicy', (req, resp, next) => Hotel.addPolicy(req, resp, next));
 // route.patch('/update', (req, resp, next) => Hotel.update(req, resp, next));
+
 export { route as hotelRouter };

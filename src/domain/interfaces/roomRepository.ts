@@ -5,6 +5,7 @@ export interface IRoomRepository {
   create(hotel: any): Promise<any>;
   update(hotel: any, Id: string): Promise<any>;
   delete(id: string[]): Promise<string>;
-  hourAdd(data:any): Promise<any>
-  hoursDelete(ids:any): Promise<any>
+  hourAdd(data: any): Promise<any>;
+  hoursDelete(ids: any): Promise<any>;
+  hoursFind(id: any): Promise<any>;
 }

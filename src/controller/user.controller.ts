@@ -10,7 +10,8 @@ import {
   RegisterSchema,
   verifyUserSchema,
 } from '../validator/userValidation';
-import sendVerificationEmail from '../utils/sendmail';
+import sendVerificationEmail from 'src/utils/sendmail';
+// import sendVerificationEmail from '../utils/sendmail';
 
 class userController {
   private _userDIController = DIcontainer.getGetAllUsersUseCase();
@@ -77,6 +78,11 @@ class userController {
       return next(verifyUser);
     }
     return successResponse(resp, verifyUser);
+  }
+  async allusers(req: Request, resp: Response, next: NextFunction) {
+    const user = await this._userDIController.getalluser();
+
+    return successResponse(resp, 'user get sucessfully', user);
   }
 }
 export default userController;

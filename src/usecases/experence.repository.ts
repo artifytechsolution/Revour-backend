@@ -11,7 +11,15 @@ export class ExperienceRepository implements IexperienceRepository {
     });
   }
   async findAll(): Promise<any[]> {
-    return await prisma.experience.findMany();
+    return await prisma.experience.findMany({
+      include: {
+        images: {
+          where: {
+            is_primary: true,
+          },
+        },
+      },
+    });
   }
   async findById(id: string): Promise<any | null> {
     const data = await prisma.experience.findUnique({
@@ -47,6 +55,13 @@ export class ExperienceRepository implements IexperienceRepository {
     return data;
   }
   async uploadImage(tablename: string, data: any) {
+    if (tablename == 'users') {
+      // const createImage = (prisma as any)[tablename].update({
+      //   data: data,
+      // });
+      console.log('user data is commiggggg');
+      console.log(data);
+    }
     const createImage = (prisma as any)[tablename].createMany({
       data: data,
     });

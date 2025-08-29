@@ -13,15 +13,18 @@ export default class RoomService {
 
   async create(roomData: any): Promise<any> {
     try {
-      const hotelAvilable = await this.hotelRepo.findById(roomData.hotel_id);
+      console.log('main rooom data is comminggg form thata----!!!!!!!');
+      console.log(roomData);
+      const hotelAvilable = await this.hotelRepo.findById(roomData[0].hotel_id);
+      const maindatahotel = roomData.map((items: any) => ({
+        ...items,
+        hotel_id: hotelAvilable?.hotel_id,
+      }));
 
       if (!hotelAvilable) {
         throw new CustomError('hotel is not exist', statusCode.notFound);
       }
-      const createRoom = await this.roomRepo.create({
-        ...roomData,
-        hotel_id: hotelAvilable.hotel_id,
-      });
+      const createRoom = await this.roomRepo.create(maindatahotel);
       if (!createRoom) {
         throw new CustomError('hotel is not created', statusCode.notFound);
       }
@@ -109,17 +112,23 @@ export default class RoomService {
       throw new CustomError('An unknown error occurred', 500);
     }
   }
-  async addHours(data:any){
-     try {
-      const hotelAvilable = await this.hotelRepo.findById(data.hotel_id);
+  async addHours(data: any) {
+    try {
+      const hotelAvilable = await this.hotelRepo.findById(data[0].hotel_id);
+      console.log('hotel is also found-----!!!!!!');
+      console.log(hotelAvilable);
+      const customedata = data.map((item: any) => ({
+        duration_hours: item.hours,
+        rate_per_hour: item.price,
+        hotel_id: hotelAvilable?.hotel_id,
+      }));
+      console.log('custome data is comminggg !!!!!!====');
+      console.log(customedata);
 
       if (!hotelAvilable) {
         throw new CustomError('hotel is not exist', statusCode.notFound);
       }
-      const createHours = await this.roomRepo.hourAdd({
-        ...data,
-        hotel_id: hotelAvilable.hotel_id,
-      });
+      const createHours = await this.roomRepo.hourAdd(customedata);
       if (!createHours) {
         throw new CustomError('hotel is not created', statusCode.notFound);
       }
@@ -134,7 +143,7 @@ export default class RoomService {
       throw new CustomError('An unknown error occurred', 500);
     }
   }
-    async deleteHours(id: any[]) {
+  async deleteHours(id: any[]) {
     try {
       const deleteHotel: any = await this.roomRepo.hoursDelete(id);
       if (deleteHotel.count == 0) {
@@ -151,6 +160,7 @@ export default class RoomService {
       throw new CustomError('An unknown error occurred', 500);
     }
   }
+
   // async update(id: string, data: any) {
   //   try {
   //     const updatedHotel = await this.findById(id);

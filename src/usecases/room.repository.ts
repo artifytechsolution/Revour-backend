@@ -18,11 +18,14 @@ export class RoomRepository implements IRoomRepository {
       where: {
         id: id,
       },
+      include: {
+        hotel: true,
+      },
     });
   }
 
   async create(room: any): Promise<any> {
-    return await prisma.room_types.create({
+    return await prisma.room_types.createMany({
       data: room,
     });
   }
@@ -44,17 +47,27 @@ export class RoomRepository implements IRoomRepository {
     });
     return data;
   }
-  async hourAdd(data:any): Promise<any>{
-    return await prisma.room_hourly_rates.create({
+  async hourAdd(data: any): Promise<any> {
+    console.log('main component custome data is heerree !!!===');
+    console.log(data);
+    return await prisma.room_hourly_rates.createMany({
       data: data,
     });
   }
-  async hoursDelete(ids:any): Promise<any>{
+  async hoursDelete(ids: any): Promise<any> {
     const data = await prisma.room_hourly_rates.deleteMany({
       where: {
         id: {
           in: ids,
         },
+      },
+    });
+    return data;
+  }
+  async hoursFind(Id: any): Promise<any> {
+    const data = await prisma.room_hourly_rates.findUnique({
+      where: {
+        id: Id,
       },
     });
     return data;

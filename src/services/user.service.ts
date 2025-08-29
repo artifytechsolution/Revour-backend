@@ -1,4 +1,5 @@
 // import { statusCode } from 'src/config/statuscode';
+import prisma from 'src/config/db.config';
 import { statusCode } from '../config/statuscode';
 import { User, userLogin } from '../domain/entity/user';
 import { UserRepository } from '../usecases/user.repository';
@@ -87,5 +88,9 @@ export default class UserService {
       return new CustomError('user is not updated', statusCode.badRequest);
     }
     return 'updated ssucessfully';
+  }
+  async getalluser() {
+    const user = await prisma.users.findMany({});
+    return user;
   }
 }

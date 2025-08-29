@@ -48,23 +48,66 @@ class ExperienceController {
       );
     }
   }
-  async find(req: Request, resp: Response, next: NextFunction) {
+  // async find(req: Request, resp: Response, next: NextFunction) {
+  //   try {
+  //     const Hotel = await this._experienceDIcontroller.find();
+  //     if (Hotel instanceof CustomError) {
+  //       return next(Hotel);
+  //     }
+  //     return successResponse(resp, 'get experience successfully', Hotel);
+  //   } catch (err: any) {
+  //     if (err.name === 'ValidationError') {
+  //       const formattedErrors = handleYupError(err);
+  //       return errorResponse(resp, 'Validation failed', formattedErrors, 400);
+  //     }
+  //     return next(
+  //       err instanceof CustomError
+  //         ? err
+  //         : new CustomError('An unexpected error occurred', 500),
+  //     );
+  //   }
+  // }
+  public async find(req: Request, resp: Response, next: NextFunction) {
     try {
-      const Hotel = await this._experienceDIcontroller.find();
-      if (Hotel instanceof CustomError) {
-        return next(Hotel);
+      // 1. Destructure query parameters from the request
+      const { page: pageQuery, limit: limitQuery, search } = req.query;
+
+      const options: { page?: number; limit?: number; search?: string } = {};
+
+      // 2. Validate 'limit' if it exists
+      if (limitQuery) {
+        const limit = parseInt(limitQuery as string, 10);
+        if (isNaN(limit) || limit < 1) {
+          return errorResponse(
+            resp,
+            "Invalid 'limit' parameter. Must be a positive number.",
+            400,
+          );
+        }
+        options.limit = limit;
       }
-      return successResponse(resp, 'get experience successfully', Hotel);
-    } catch (err: any) {
-      if (err.name === 'ValidationError') {
-        const formattedErrors = handleYupError(err);
-        return errorResponse(resp, 'Validation failed', formattedErrors, 400);
+
+      if (pageQuery) {
+        const page = parseInt(pageQuery as string, 10);
+        if (isNaN(page) || page < 1) {
+          return errorResponse(
+            resp,
+            "Invalid 'page' parameter. Must be a positive number.",
+            400,
+          );
+        }
+        options.page = page;
       }
-      return next(
-        err instanceof CustomError
-          ? err
-          : new CustomError('An unexpected error occurred', 500),
-      );
+
+      if (search && typeof search === 'string' && search.trim() !== '') {
+        options.search = search.trim();
+      }
+
+      const result = await this._experienceDIcontroller.find(options);
+
+      return successResponse(resp, 'Hotels retrieved successfully', result);
+    } catch (err) {
+      return next(err);
     }
   }
   async delete(req: Request, resp: Response, next: NextFunction) {
@@ -90,6 +133,7 @@ class ExperienceController {
       );
     }
   }
+  async addameniities(req: Request, resp: Response, next: NextFunction) {}
 
   // async update(req: Request, resp: Response, next: NextFunction) {
   //   try {

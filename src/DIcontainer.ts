@@ -31,6 +31,7 @@ class DIcontainer {
     return new HotelServices(
       this.getHotelRepository(),
       this.getExperienceRepository(),
+      this.getUerRepository(),
     );
   }
   static getExperienceRepository() {
@@ -54,11 +55,17 @@ class DIcontainer {
       this.getHotelRepository(),
     );
   }
-  static getOrderRepository(){
+  static getOrderRepository() {
     return this._orderRepo;
   }
-  static getGetOrderUseCase(){
-    return new OrderService(this.getOrderRepository(),this.getUerRepository())
+  static getGetOrderUseCase() {
+    return new OrderService(
+      this.getOrderRepository(),
+      this.getUerRepository(),
+      this.getRoomRepository(),
+      this.getExperienceRepository(),
+      this.getHotelRepository(),
+    );
   }
 }
 export default DIcontainer;
