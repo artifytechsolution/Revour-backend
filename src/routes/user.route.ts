@@ -16,4 +16,12 @@ route.get('/', (req, resp, next) => usercontroller.allusers(req, resp, next));
 route.patch('/verify', (req, resp, next) =>
   usercontroller.verifyUser(req, resp, next),
 );
+
+route.patch('/forgetpassword', (req, resp, next) =>
+  usercontroller.Forgetpassword(req, resp, next),
+);
+
+route.post('/sendmail', (req, resp, next) =>
+  usercontroller.sendMail(req, resp, next),
+);
 export { route as userRoute };

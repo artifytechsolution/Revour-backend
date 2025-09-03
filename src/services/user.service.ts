@@ -89,6 +89,24 @@ export default class UserService {
     }
     return 'updated ssucessfully';
   }
+  async forgetpassword(data: any, id: string) {
+    const findUser = await this.userRepo.findById(id);
+    if (!findUser) {
+      return new CustomError('user is not exist', statusCode.badRequest);
+    }
+    console.log('main forgetpassword data is comming');
+    const updateUser = await this.userRepo.update(
+      {
+        password: data.password,
+        salt: data.salt,
+      },
+      id,
+    );
+    if (!updateUser) {
+      return new CustomError('password is not updated', statusCode.badRequest);
+    }
+    return findUser;
+  }
   async getalluser() {
     const user = await prisma.users.findMany({});
     return user;

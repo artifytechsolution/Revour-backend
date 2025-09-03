@@ -10,7 +10,12 @@ import {
   RegisterSchema,
   verifyUserSchema,
 } from '../validator/userValidation';
-import sendVerificationEmail from 'src/utils/sendmail';
+import {
+  sendForgotPasswordEmail,
+  sendVerificationEmail,
+} from 'src/utils/sendmail';
+import prisma from 'src/config/db.config';
+
 // import sendVerificationEmail from '../utils/sendmail';
 
 class userController {
@@ -83,6 +88,62 @@ class userController {
     const user = await this._userDIController.getalluser();
 
     return successResponse(resp, 'user get sucessfully', user);
+  }
+  async Forgetpassword(req: Request, resp: Response, next: NextFunction) {
+    try {
+      const { password, salt } = encryptPassword.Encrypt(req.body.password);
+      const userData = await this._userDIController.forgetpassword(
+        {
+          password: password,
+          salt: salt,
+        },
+        req.query.token as string,
+      );
+      if (userData instanceof CustomError) {
+        return next(userData);
+      }
+      sendForgotPasswordEmail(userData.email, userData.id);
+      return successResponse(resp, 'password updated sucessfully', userData);
+    } catch (err: any) {
+      if (err.name === 'ValidationError') {
+        const formattedErrors = handleYupError(err);
+        return errorResponse(resp, 'Validation failed', formattedErrors, 400);
+      }
+      return next(
+        err instanceof CustomError
+          ? err
+          : new CustomError('An unexpected error occurred', 500),
+      );
+    }
+  }
+  async sendMail(req: Request, resp: Response, next: NextFunction) {
+    try {
+      const { email } = req.body;
+      const user = await prisma.users.findUnique({
+        where: {
+          email: email,
+        },
+      });
+      if (!user) {
+        throw new CustomError('user not found', 404);
+      }
+      sendForgotPasswordEmail(user.email, user.id);
+      return successResponse(
+        resp,
+        'Please check your email, I have sent you a password reset link',
+        user,
+      );
+    } catch (err: any) {
+      if (err.name === 'ValidationError') {
+        const formattedErrors = handleYupError(err);
+        return errorResponse(resp, 'Validation failed', formattedErrors, 400);
+      }
+      return next(
+        err instanceof CustomError
+          ? err
+          : new CustomError('An unexpected error occurred', 500),
+      );
+    }
   }
 }
 export default userController;
