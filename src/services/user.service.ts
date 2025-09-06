@@ -17,6 +17,14 @@ export default class UserService {
       if (userAvailable) {
         throw new CustomError('User already exists', 404);
       }
+      const phonenumber = await prisma.users.findFirst({
+        where: {
+          phone: userData?.phone ?? null,
+        },
+      });
+      if (phonenumber) {
+        throw new CustomError('phone number is already exist', 404);
+      }
       return await this.userRepo.create(userData);
     } catch (error: unknown) {
       if (error instanceof CustomError) {

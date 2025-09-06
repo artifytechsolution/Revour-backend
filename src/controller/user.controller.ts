@@ -59,6 +59,8 @@ class userController {
       }
       return successResponse(resp, 'Login sucessfully', LoginUser);
     } catch (err: any) {
+      console.log('error is commingggg');
+      console.log(err);
       if (err.name === 'ValidationError') {
         const formattedErrors = handleYupError(err);
         return errorResponse(resp, 'Validation failed', formattedErrors, 400);

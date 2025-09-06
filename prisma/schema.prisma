@@ -253,7 +253,7 @@ model reservations {
   user              users     @relation(fields: [user_id], references: [userId], onDelete: Restrict)
   experience        experience? @relation(fields: [experience_id], references: [experience_id])
   check_in_datetime  DateTime?
-  chck_in_hours      DateTime?
+  chck_in_hours      String?
   check_out_datetime DateTime?
   total_days         Int?    @default(0)
   total_amount       Decimal   @db.Decimal(10, 2)

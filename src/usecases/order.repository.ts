@@ -82,6 +82,9 @@ export class OrderRepository implements IOrderRepository {
         },
         user: true,
       },
+      orderBy: {
+        createdAt: 'desc', // ✅ newest orders first
+      },
     });
   }
 }

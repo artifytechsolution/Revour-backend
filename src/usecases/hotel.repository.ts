@@ -50,6 +50,7 @@ export class HotelRepository implements IHotelRepository {
         hotel_images: true,
         hotel_ratings: true,
         room_types: true,
+        room_hourly_rates: true,
         PrivacyPolicy: true,
         Amenity: true,
       },

@@ -360,6 +360,7 @@ export default class OrderService {
         experience_id,
         check_in_datetime,
         check_out_datetime,
+        chck_in_hours,
         item_id,
       } = data;
       const user: any = await this.userRepo.findById(user_id);
@@ -459,6 +460,7 @@ export default class OrderService {
         user_id: user.userId,
         check_in_datetime: new Date(check_in_datetime) ?? new Date(),
         check_out_datetime: new Date(check_out_datetime) ?? new Date(),
+        chck_in_hours: chck_in_hours,
         total_amount: total,
         booking_type: booking_type ?? 'full day',
         duration_hours: duration_hours ? duration_hours : days * 24,

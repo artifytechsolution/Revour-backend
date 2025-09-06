@@ -15,7 +15,11 @@ class OrderController {
       if (hotel instanceof CustomError) {
         return next(hotel);
       }
-      return successResponse(resp, 'user register successfully', hotel);
+      return successResponse(
+        resp,
+        'Your booking has been confirmed successfully',
+        hotel,
+      );
     } catch (err: any) {
       if (err.name === 'ValidationError') {
         return errorResponse(resp, 'Validation failed', 400);
@@ -35,7 +39,11 @@ class OrderController {
       if (hotel instanceof CustomError) {
         return next(hotel);
       }
-      return successResponse(resp, 'book your hotel sucessfully', hotel);
+      return successResponse(
+        resp,
+        'Your booking has been confirmed successfully',
+        hotel,
+      );
     } catch (err: any) {
       if (err.name === 'ValidationError') {
         return errorResponse(resp, 'Validation failed', 400);
