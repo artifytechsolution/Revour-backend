@@ -110,6 +110,8 @@ model hotels {
   city              String              @db.VarChar(50)
   country           String              @db.VarChar(50)
   map_url           String?             
+  latitude          Float?
+  longitude         Float?
   phone             String?             @db.VarChar(20)
   email             String?             @unique @db.VarChar(100)
   description       String?
