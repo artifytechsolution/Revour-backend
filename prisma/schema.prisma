@@ -111,7 +111,7 @@ model hotels {
   country           String              @db.VarChar(50)
   map_url           String?             
   phone             String?             @db.VarChar(20)
-  email             String?              @db.VarChar(100)
+  email             String?             @unique @db.VarChar(100)
   description       String?
   star_rating       Int? // 1-5, enforce via application logic
   isHourly          Boolean             @default(false)
