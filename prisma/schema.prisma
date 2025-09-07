@@ -69,6 +69,8 @@ model users {
   role       UserRole  @default(CUSTOMER)
   otp        String?
   isVerified Boolean   @default(false)
+  hotel_id   Int?
+  hotel      hotels?    @relation(fields: [hotel_id],references: [hotel_id],onDelete: Cascade)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime? @updatedAt
@@ -132,6 +134,8 @@ model hotels {
   PrivacyPolicy PrivacyPolicy[]
 
   Amenity Amenity[]
+
+  users users[]
 }
 
 model hotel_images {
