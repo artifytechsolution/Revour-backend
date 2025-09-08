@@ -29,6 +29,12 @@ route.get('/hotelunavilableById/:id', (req, resp, next) =>
 route.get('/find/hotelunavilableList', (req, resp, next) =>
   Hotel.hotelunavilableList(req, resp, next),
 );
+route.put('/updaterooms', (req, resp, next) =>
+  Hotel.updatehours(req, resp, next),
+);
+route.put('/updaterooms2', (req, resp, next) =>
+  Hotel.updaterooms(req, resp, next),
+);
 route.post('/addAmenities', (req, resp, next) =>
   Hotel.addAmenities(req, resp, next),
 );

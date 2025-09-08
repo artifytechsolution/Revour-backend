@@ -4,6 +4,7 @@ import DIcontainer from '../DIcontainer';
 import { CustomError } from '../utils/customeerror';
 import { errorResponse, successResponse } from '../utils/responce';
 import { handleYupError } from '../utils/yuperror';
+import prisma from 'src/config/db.config';
 
 class HotelController {
   private _HotelDIController = DIcontainer.getGetAllhotelUseCase();
@@ -419,27 +420,68 @@ class HotelController {
       );
     }
   }
-  // async update(req: Request, resp: Response, next: NextFunction) {
-  //   try {
-  //     const hotelupadte: any = await this._HotelDIController.update(
-  //       req.body,
-  //       req.params.id,
-  //     );
-  //     if (hotelupadte instanceof CustomError) {
-  //       return next(hotelupadte);
-  //     }
-  //     return successResponse(hotelupadte, 'hotel deleted successfully');
-  //   } catch (err: any) {
-  //     if (err.name === 'ValidationError') {
-  //       const formattedErrors = handleYupError(err);
-  //       return errorResponse(resp, 'Validation failed', formattedErrors, 400);
-  //     }
-  //     return next(
-  //       err instanceof CustomError
-  //         ? err
-  //         : new CustomError('An unexpected error occurred', 500),
-  //     );
-  //   }
-  // }
+  async updatehours(req: Request, resp: Response, next: NextFunction) {
+    try {
+      const data = req.body;
+      const { id, rate_per_hour, hotel_id, ...rest } = data;
+
+      console.log('update data is comming xxx---------->');
+      console.log(data);
+      console.log(rest);
+
+      const hotelupdate: any = await prisma.room_hourly_rates.update({
+        where: { id },
+        data: {
+          duration_hours: data.duration_hours,
+          rate_per_hour: data.rate_per_hour,
+        },
+      });
+
+      // if (hotelupdate instanceof CustomError) {
+      //   return next(hotelupdate);
+      // }
+      return successResponse(resp, 'hotel deleted successfully', hotelupdate);
+    } catch (err: any) {
+      if (err.name === 'ValidationError') {
+        const formattedErrors = handleYupError(err);
+        return errorResponse(resp, 'Validation failed', formattedErrors, 400);
+      }
+      return next(
+        err instanceof CustomError
+          ? err
+          : new CustomError('An unexpected error occurred', 500),
+      );
+    }
+  }
+  async updaterooms(req: Request, resp: Response, next: NextFunction) {
+    try {
+      const data: any = req.body;
+      console.log('main rooms api is callleddddd--------');
+      console.log(data);
+
+      const hotelupdate: any = await prisma.room_types.update({
+        where: { id: data.id },
+        data: {
+          type_name: data.type_name,
+          base_price: data.base_price,
+        },
+      });
+
+      if (hotelupdate instanceof CustomError) {
+        return next(hotelupdate);
+      }
+      return successResponse(resp, 'hotel deleted successfully', hotelupdate);
+    } catch (err: any) {
+      if (err.name === 'ValidationError') {
+        const formattedErrors = handleYupError(err);
+        return errorResponse(resp, 'Validation failed', formattedErrors, 400);
+      }
+      return next(
+        err instanceof CustomError
+          ? err
+          : new CustomError('An unexpected error occurred', 500),
+      );
+    }
+  }
 }
 export default HotelController;

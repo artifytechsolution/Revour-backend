@@ -161,6 +161,7 @@ export default class HotelServices {
         hotel_images: { where: { is_primary: true } },
         room_hourly_rates: true,
         hotel_ratings: true,
+        room_types: true,
       },
     });
 
