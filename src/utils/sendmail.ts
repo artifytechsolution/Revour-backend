@@ -95,7 +95,7 @@ const sendHotelRegistrationEmail = async (
 ): Promise<void> => {
   const loginURL = `${process.env.FRONT_END_URL}/login`;
 
-  const transporter: Transporter = nodemailer.createTransport({
+  const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.hostinger.com',
     port: 465,
     secure: process.env.SMTP_SECURE === 'true' || true, // SSL when using port 465
