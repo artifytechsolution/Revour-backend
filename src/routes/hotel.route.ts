@@ -14,7 +14,7 @@ route.get('/', (req, resp, next) => Hotel.find(req, resp, next));
 route.delete('/delete', (req, resp, next) => Hotel.delete(req, resp, next));
 route.post(
   '/upload',
-  upload.array('images', 5),
+  upload.array('images', 12),
   (req: any, resp: any, next: any) => Hotel.uploadImage(req, resp, next),
 );
 route.get('/find/hours', (req, resp, next) =>
